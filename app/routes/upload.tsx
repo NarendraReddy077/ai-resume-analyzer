@@ -1,12 +1,80 @@
 import { useState, type FormEvent } from "react";
+import { useNavigate } from "react-router";
+import FileUploader from "~/components/fileUploader";
 import Navbar from "~/components/Navbar";
+import { prepareInstructions } from "~/constants";
+import { convertPdfToImage } from "~/lib/pdf2img";
+import { usePuterStore } from "~/lib/puter";
+import { generateUUID } from "~/lib/utils";
 
 const upload = () => {
     
+    const { auth, isLoading, ai, kv, fs } = usePuterStore();
+    const navigate = useNavigate();
     const [isProcessing, setIsProcessing] = useState(false);
     const [statusText, setStatusText] = useState("");
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const [file, setFile] = useState<File | null>(null);
+    
+    const handleFileSelect = (file: File | null) => {
+        setFile(file);
+    }
+    
+    const handleAnalyze = async({companyName, jobTitle, jobDescription, file}: {companyName: string, jobTitle: string, jobDescription: string, file: File}) => {
+        setIsProcessing(true);
+        setStatusText("Uploading your resume...");
+        const uploadedFile = await fs.upload([file])
 
+        if(!uploadedFile) return setStatusText('Error: Failed to Upload Resume');
+        setStatusText('Converting to image...');
+        const imageFile = await convertPdfToImage(file);
+        if(!imageFile.file) return setStatusText('Error: Failed to Convert Resume to Image');
+
+        setStatusText('Upoading the Image...');
+        const uploadedImage = await fs.upload([imageFile.file]);
+        if(!uploadedImage) return setStatusText('Error: Failed to Upload Image');
+
+        setStatusText('Preparing data...')
+
+        const uuid = generateUUID();
+        const data = {
+            id: uuid, 
+            resumePath: uploadedFile.path, 
+            imagePath: uploadedImage.path, 
+            companyName, jobTitle, jobDescription, 
+            feedback: '', 
+        }
+        await kv.set(`resume:${uuid}`, JSON.stringify(data));
+
+        setStatusText("Analyzing...")
+
+        const feedback = await ai.feedback(
+            uploadedFile.path,
+            prepareInstructions({jobTitle, jobDescription})
+        )
+
+        if (!feedback) return setStatusText('Error: Failed to analyze Resume.');
+        const feedbackText = typeof feedback.message.content === 'string'
+            ? feedback.message.content: feedback.message.content[0].text;
+
+        data.feedback = JSON.parse(feedbackText);
+        await kv.set(`resume:${uuid}`, JSON.stringify(data));
+        setStatusText("Analyzing Resume completed. redirecting...");
+
+        console.log(data);
+    }
+
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const form = e.currentTarget.closest('form');
+        if (!form) return;
+        const formData = new FormData(form);
+
+        const companyName = formData.get('comapany-name') as string;
+        const jobTitle = formData.get('job-title') as string;
+        const jobDesc = formData.get('Job-Description') as string;
+
+        if(!file) return;
+        handleAnalyze({companyName, jobTitle, jobDescription: jobDesc, file});
     }
 
     return (
@@ -36,17 +104,17 @@ const upload = () => {
                             </div>
                             <div className="form-div">
                                 <label htmlFor="desc">Job Description</label>
-                                <textarea rows={5} id="desc" placeholder="Job Description" name="Job Description" />
+                                <textarea rows={5} id="desc" placeholder="Job Description" name="Job-Description" />
                             </div>
                             <div className="form-div">
                                 <label htmlFor="uploader">Upload Resume</label>
-                                <div>Uploader</div>
+                                <FileUploader onFileSelect={handleFileSelect} />
                             </div>
                             <button type="submit" className="primary-button mt-4">
                                 Analyze Resume
                             </button>
                         </form>)}
-                </div>        
+                </div>
             </section>
         </main>
     )

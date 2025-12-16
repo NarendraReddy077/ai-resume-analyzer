@@ -60,7 +60,7 @@ export const resumes: Resume[] = [
     },
   },
   {
-    id: "4",
+    id: "3",
     companyName: "Apple",
     jobTitle: "iOS Developer",
     imagePath: "/images/resume_03.png",
@@ -90,7 +90,7 @@ export const resumes: Resume[] = [
     },
   },
   {
-    id: "1",
+    id: "4",
     companyName: "Google",
     jobTitle: "Frontend Developer",
     imagePath: "/images/resume_01.png",
@@ -198,12 +198,10 @@ export const AIResponseFormat = `
 export const prepareInstructions = ({
   jobTitle,
   jobDescription,
-  AIResponseFormat,
 }: {
   jobTitle: string;
   jobDescription: string;
-  AIResponseFormat: string;
-}) =>
+  }) =>
   `You are an expert in ATS (Applicant Tracking System) and resume analysis.
   Please analyze and rate this resume and suggest how to improve it.
   The rating can be low if the resume is bad.
