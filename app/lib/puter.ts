@@ -327,6 +327,28 @@ export const usePuterStore = create<PuterStore>((set, get) => {
     >;
   };
 
+  /**
+   * Sends a file and text message to Claude AI for analysis and feedback.
+   * 
+   * @param path - The Puter file system path to the file to be analyzed
+   * @param message - The text message or prompt to send along with the file
+   * @returns A promise that resolves to an AIResponse object containing the AI's feedback, or undefined if the request fails
+   * @throws Sets error state if Puter.js is not available
+   * 
+   * @remarks
+   * Available models:
+   * - "claude-sonnet-4" (default) - Latest Claude Sonnet model
+   * - "claude-opus" - Most capable Claude model
+   * - "claude-haiku" - Fastest Claude model
+   * - "gpt-4" - OpenAI's GPT-4
+   * - "gpt-4-turbo" - OpenAI's GPT-4 Turbo
+   * - "gpt-3.5-turbo" - OpenAI's GPT-3.5 Turbo
+   * 
+   * @example
+   * ```typescript
+   * const response = await feedback('/home/user/resume.pdf', 'Please analyze this resume');
+   * ```
+   */
   const feedback = async (path: string, message: string) => {
     const puter = getPuter();
     if (!puter) {

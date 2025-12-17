@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
-import Summary from "~/components/summary";
+import Details from "~/components/Details";
+import Summary from "~/components/Summary";
+import Ats from "~/components/Ats";
 import { usePuterStore } from "~/lib/puter";
 
 export const meta = () => ([
@@ -54,9 +56,9 @@ const Resume = () => {
                 </Link>
             </nav>
             <div className="flex flex-row w-full max-lg:flex-col-reverse">
-                <section className="feedback-section bg-[url('/images/gb-small.svg')] bg-cover sticky top-0 h-[100vh] items-center justify-center">
+                <section className="feedback-section bg-[url('/images/bg-small.svg')] bg-cover sticky top-0 h-[100vh] items-center justify-center">
                     {imageUrl && resumeUrl && (
-                        <div className="animate-in fade-in duration-1000 gradient-border max-sm:m-10 h-[90%] max-wxl:h-fit w-fit">
+                        <div className="animate-in fade-in duration-1000 gradient-border max-sm:m-4 h-[100%] w-[100%] max-wxl:h-fit">
                             <a href={resumeUrl} target="_blank" rel="noopener noreferrer">
                                 <img src={imageUrl} className="w-full h-full object-contain rounded-2xl"
                                     title="resume"/>                                 
