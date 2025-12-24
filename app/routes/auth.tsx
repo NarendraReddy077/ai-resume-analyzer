@@ -3,8 +3,8 @@ import { useLocation, useNavigate } from "react-router";
 import { usePuterStore } from "~/lib/puter";
 
 export const meta = () => ([
-    {title: "Auth - Resumind"}, 
-    {name: 'description', content: 'Authenticate to access AI Resume Analyzer features'}
+    { title: "Auth - Resumind" },
+    { name: 'description', content: 'Authenticate to access AI Resume Analyzer features' }
 ])
 
 const Auth = () => {
@@ -18,33 +18,30 @@ const Auth = () => {
     }, [auth.isAuthenticated, next]);
 
     return (
-        <main className="bg-[url('/images/bg-main.svg')] bg-cover main-h-screen flex items-center justify-center">
-            <div className="gradient-border shadow-lg">
-                <section className="flex flex-col gap-8 bg-white rounded-2xl p-10">
-                    <div className="flex flex-col items-center gap-2 text-center">
-                        <h1>Welcome to Resumind</h1>
-                        <h2>Please sign in to continue</h2>
-                    </div>
-                    <div>
-                        {isLoading ? (
-                            <button className="auth-button animate-pulse">
-                                <p>Signing you in...</p>
+        <main className="bg-[url('/images/3409297.jpg')] bg-cover main-h-screen flex items-center justify-center">
+            <section className="flex flex-col gap-8 rounded-2xl p-10">
+                <div className="flex flex-col items-center gap-2 text-center">
+                    <h1>Welcome to Resumind</h1>
+                    <h2>Please sign in to continue</h2>
+                </div>
+                <div>
+                    {isLoading ? (
+                        <button className="auth-button animate-pulse">
+                            <p>Signing you in...</p>
+                        </button>
+                    ) : <>
+                        {auth.isAuthenticated ? (
+                            <button className="auth-button" onClick={auth.signOut}>
+                                <p>Log Out</p>
                             </button>
-                        ): <>
-                            {auth.isAuthenticated ? (
-                                <button className="auth-button" onClick={auth.signOut}>
-                                    <p>Log Out</p>
-                                </button>
-                                ) : (
-                                <button className="auth-button" onClick={auth.signIn}>
-                                    <p>Log In</p>
-                                </button>
-                            )}
-                        </>}
-                    </div>
-                </section>
-
-            </div>
+                        ) : (
+                            <button className="auth-button" onClick={auth.signIn}>
+                                <p>Log In</p>
+                            </button>
+                        )}
+                    </>}
+                </div>
+            </section>
         </main>
     )
 }

@@ -8,40 +8,40 @@ import { usePuterStore } from "~/lib/puter";
 import { generateUUID } from "~/lib/utils";
 
 const upload = () => {
-    
+
     const { auth, isLoading, ai, kv, fs } = usePuterStore();
     const navigate = useNavigate();
     const [isProcessing, setIsProcessing] = useState(false);
     const [statusText, setStatusText] = useState("");
     const [file, setFile] = useState<File | null>(null);
-    
+
     const handleFileSelect = (file: File | null) => {
         setFile(file);
     }
-    
-    const handleAnalyze = async({companyName, jobTitle, jobDescription, file}: {companyName: string, jobTitle: string, jobDescription: string, file: File}) => {
+
+    const handleAnalyze = async ({ companyName, jobTitle, jobDescription, file }: { companyName: string, jobTitle: string, jobDescription: string, file: File }) => {
         setIsProcessing(true);
         setStatusText("Uploading your resume...");
         const uploadedFile = await fs.upload([file])
 
-        if(!uploadedFile) return setStatusText('Error: Failed to Upload Resume');
+        if (!uploadedFile) return setStatusText('Error: Failed to Upload Resume');
         setStatusText('Converting to image...');
         const imageFile = await convertPdfToImage(file);
-        if(!imageFile.file) return setStatusText('Error: Failed to Convert Resume to Image');
+        if (!imageFile.file) return setStatusText('Error: Failed to Convert Resume to Image');
 
         setStatusText('Upoading the Image...');
         const uploadedImage = await fs.upload([imageFile.file]);
-        if(!uploadedImage) return setStatusText('Error: Failed to Upload Image');
+        if (!uploadedImage) return setStatusText('Error: Failed to Upload Image');
 
         setStatusText('Preparing data...')
 
         const uuid = generateUUID();
         const data = {
-            id: uuid, 
-            resumePath: uploadedFile.path, 
-            imagePath: uploadedImage.path, 
-            companyName, jobTitle, jobDescription, 
-            feedback: '', 
+            id: uuid,
+            resumePath: uploadedFile.path,
+            imagePath: uploadedImage.path,
+            companyName, jobTitle, jobDescription,
+            feedback: '',
         }
         await kv.set(`resume:${uuid}`, JSON.stringify(data));
 
@@ -49,12 +49,12 @@ const upload = () => {
 
         const feedback = await ai.feedback(
             uploadedFile.path,
-            prepareInstructions({jobTitle, jobDescription})
+            prepareInstructions({ jobTitle, jobDescription })
         )
 
         if (!feedback) return setStatusText('Error: Failed to analyze Resume.');
         const feedbackText = typeof feedback.message.content === 'string'
-            ? feedback.message.content: feedback.message.content[0].text;
+            ? feedback.message.content : feedback.message.content[0].text;
 
         data.feedback = JSON.parse(feedbackText);
         await kv.set(`resume:${uuid}`, JSON.stringify(data));
@@ -74,14 +74,14 @@ const upload = () => {
         const jobTitle = formData.get('job-title') as string;
         const jobDesc = formData.get('Job-Description') as string;
 
-        if(!file) return;
-        handleAnalyze({companyName, jobTitle, jobDescription: jobDesc, file});
+        if (!file) return;
+        handleAnalyze({ companyName, jobTitle, jobDescription: jobDesc, file });
     }
 
     return (
-        <main className="bg-[url('/images/bg-main.svg')] bg-cover" >
+        <main className="bg-[url('/images/3607424.jpg')] bg-cover" >
             <Navbar />
-            <section className="main-section">
+            <section className="main-section flex justify-center">
                 <div className="page-heading">
                     <h1>Smart feedback for your resume</h1>
                     {isProcessing ? (
@@ -93,10 +93,10 @@ const upload = () => {
                         <h2>Upload your resume to get ATS Score and AI-powered feedback.</h2>
                     )}
                     {!isProcessing && (
-                        <form className="flex flex-col gap-4 mt-4 max-w-md mx-auto" 
-                        id="upload-form" onSubmit={handleSubmit}>
+                        <form className="flex flex-col gap-4 mt-4 max-w-md mx-auto"
+                            id="upload-form" onSubmit={handleSubmit}>
                             <div className="form-div">
-                                <label htmlFor="company-name">Company Name</label>
+                                <label htmlFor="company-name" className="text-sm text-slate-300">Company Name</label>
                                 <input type="text" id="company-name" placeholder="Company Name" name="comapany-name" />
                             </div>
                             <div className="form-div">

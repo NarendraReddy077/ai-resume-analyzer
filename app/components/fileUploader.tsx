@@ -55,7 +55,7 @@ const FileUploader = ({ onFileSelect }: FileUploaderProps) => {
                             <div className='mx-auto w-16 h-16 flex items-center justify-center'>
                               <img src="/icons/info.svg" alt='upload' className='size-15' />
                             </div>
-                            <p className='text-lg text-gray-500'>
+                            <p className='text-lg text-yellow-400'>
                                 <span className='font-semibold'>
                                     Click to upload
                                 </span> or drag and drop
